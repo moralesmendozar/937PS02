@@ -281,12 +281,13 @@ for i=1:length(kGridLength)
                 profit = profitNkByNa(ik,ia);% scalar
                 investment = investmentFunction(k,kPrime); % Nk*Nb matrix
 
-                for iaMinus = 1:Na
-                    RbMinus = mRb(:,:,iaMinus); % Nk*Nb matrix
-                    aMinus = grid_a(iaMinus);
 
-                    for ib = 1:Nb
-                        bond = grid_b(ib);
+
+                for ib = 1:Nb
+                    bond = grid_b(ib);
+                    for iaMinus = 1:Na
+                        RbMinus = mRb(ik,ib,iaMinus); % scalar
+                        aMinus = grid_a(iaMinus);
 
 %                         if (1-ttaoC)*profit + (1-ddelta)*k <= bond % if default this period
 %                             value (ik,ib,ia,iaMinus)=0; % You stop operating the firm and stop choosing next period k' and b'
@@ -302,7 +303,7 @@ for i=1:length(kGridLength)
 
                         if (1-ttaoC)*profit + (1-ddelta)*k > bond % if default this period
 
-                            taxPayments = taxPaymentsFunction(k,bond,profit,RbMinus); % Nk*Nb matrix
+                            taxPayments = taxPaymentsFunction(k,bond,profit,RbMinus); % scalar
                             divident = dividentFunction(profit,investment,bond,bondPrime,RbMinus,taxPayments,isDefaultNextPeriod); % Nk*Nb matrix
                              
 %                             valueTomorrowIfDefaultKnownForSureToday = zeros(kGridLength(i),Nb,Na); % k',b',a'
@@ -405,6 +406,7 @@ title('Value Under Different Shocks given mean $z^{-}$','interpreter','latex')
 ylabel('Capital Stock $k$','interpreter','latex')
 xlabel('Debt $b$','interpreter','latex')
 zlabel('Value','interpreter','latex')
+zlim([-1.5*max(max(max(max(value)))),max(max(max(max(value))))])
 savefig('q1c_value_3D')
 
 figure(4)
@@ -539,12 +541,14 @@ for i=1:length(kGridLength)
                 profit = profitNkByNa(ik,ia);
                 investment = investmentFunction(k,kPrime); % Nk*Nb matrix
 
-                for iaMinus = 1:Na
-                    RbMinus = mRb(:,:,iaMinus); % Nk*Nb matrix
-                    aMinus = grid_a(iaMinus);
+                for ib = 1:Nb
+                    bond = grid_b(ib);
+                    
+                    for iaMinus = 1:Na
+                        RbMinus = mRb(ik,ib,iaMinus); % scalar
+                        aMinus = grid_a(iaMinus);
 
-                    for ib = 1:Nb
-                        bond = grid_b(ib);
+
 
                         if (1-ttaoC)*profit + (1-ddelta)*k <= bond % if default this period
                             value (ik,ib,ia,iaMinus)=value0(1,1,ia,iaMinus); % after restructuring, you continue to run the firm at square 1 with 0 capital and 0 bond
@@ -557,7 +561,7 @@ for i=1:length(kGridLength)
 
                         else % if not default this period
 
-                            taxPayments = taxPaymentsFunction(k,bond,profit,RbMinus); % Nk*Nb matrix
+                            taxPayments = taxPaymentsFunction(k,bond,profit,RbMinus); % scalar
                             divident = dividentFunction(profit,investment,bond,bondPrime,RbMinus,taxPayments,isDefaultNextPeriod); % Nk*Nb matrix
 
                             valueTomorrow = zeros(kGridLength(i),Nb,Na);% k',b',a'
@@ -647,6 +651,8 @@ title('Value Under Different Shocks given mean $z^{-}$','interpreter','latex')
 ylabel('Capital Stock $k$','interpreter','latex')
 xlabel('Debt $b$','interpreter','latex')
 zlabel('Value','interpreter','latex')
+% zlim([-0.5*max(max(max(max(value)))),max(max(max(max(value))))])
+zlim([0,max(max(max(max(value))))])
 savefig('q1d_value_3D')
 
 figure(7)
@@ -785,7 +791,6 @@ fprintf('Average Default Probability is %2.10f\n', defaultProbability);
 % riskyBondReturn = sum(sum(sum(sum((min(1000000000,Rf/(1-mDefault4D))).*distributionStationary0))));
 riskyBondReturn = sum(sum(sum(sum((min(10000000000000,Rf/(1-mDefault4D))).*((mDefault4D~=1).*distributionStationary0)))));
 fprintf('Required return on risky bonds on average is %2.8f\n', riskyBondReturn);
-% As we can see, corporate bonds are basically riskfree.
 
 % riskyBondReturn = Rf/(1-defaultProbability);
 % fprintf('Required return on risky bonds is %2.8f\n', riskyBondReturn);
@@ -819,12 +824,14 @@ end
 
 mRbMinus4D = zeros(kGridLength(1),Nb,Na,Na);
 for ia = 1:Na
-    a = grid_a(ia);
-    for iaMinus = 1:Na
-        aMinus = grid_a(iaMinus);
-        mRbMinus4D(:,:,ia,iaMinus)=mRb(:,:,iaMinus);
-    end
+    mRbMinus4D(:,:,ia,:)=mRb;
 end
+%     a = grid_a(ia);
+%     for iaMinus = 1:Na
+%         aMinus = grid_a(iaMinus);
+%         mRbMinus4D(:,:,ia,iaMinus)=mRb(:,:,iaMinus);
+%     end
+% end
     
 mInvestment4D = investmentFunction(mK4D,mK4D);
 mTaxPayments4D = taxPaymentsFunction(mK4D,mBond4D,mProfit4D,mRbMinus4D);
