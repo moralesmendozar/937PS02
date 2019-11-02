@@ -1,4 +1,4 @@
-% Shasha Wang PS1 Q3 FNCE 937
+% Shasha Wang PS2 Q1 FNCE 937
 
 % If one wants to do MULTIGRID to speed up the process, just change
 % kGridLength to a vector
@@ -31,7 +31,7 @@ aMean = ((r+ddelta)/aalphaK/tempK)^(1-aalphaL)*(W/aalphaL)^aalphaL; % set a such
 
 % a_grid and a's transition matrix
 m = 3; % parameter for tauchen method
-Na = 3;
+Na = 5;
 rrho = 0.7;
 ssigma = 0.05;
 [grid_a_log,m_a_prob] = tauchen(Na,log(aMean),rrho,ssigma,m);
@@ -288,17 +288,19 @@ for i=1:length(kGridLength)
                     for ib = 1:Nb
                         bond = grid_b(ib);
 
-                        if (1-ttaoC)*profit + (1-ddelta)*k <= bond % if default this period
-                            value (ik,ib,ia,iaMinus)=0; % You stop operating the firm and stop choosing next period k' and b'
-                            % nothing will happen to policy function index matrix or function matrix - entry remains 0
-                            
-%                             kPolicyIndex(ik,ib,ia,iaMinus) = 1;
-%                             bPolicyIndex(ik,ib,ia,iaMinus) = 1;
+%                         if (1-ttaoC)*profit + (1-ddelta)*k <= bond % if default this period
+%                             value (ik,ib,ia,iaMinus)=0; % You stop operating the firm and stop choosing next period k' and b'
+%                             % nothing will happen to policy function index matrix or function matrix - entry remains 0
+%                             
+% %                             kPolicyIndex(ik,ib,ia,iaMinus) = 1;
+% %                             bPolicyIndex(ik,ib,ia,iaMinus) = 1;
+% % 
+% %                             kPolicy(ik,ib,ia,iaMinus) = grid_k(1);
+% %                             bPolicy(ik,ib,ia,iaMinus) = grid_b(1);
 % 
-%                             kPolicy(ik,ib,ia,iaMinus) = grid_k(1);
-%                             bPolicy(ik,ib,ia,iaMinus) = grid_b(1);
+%                         else % if not default this period
 
-                        else % if not default this period
+                        if (1-ttaoC)*profit + (1-ddelta)*k > bond % if default this period
 
                             taxPayments = taxPaymentsFunction(k,bond,profit,RbMinus); % Nk*Nb matrix
                             divident = dividentFunction(profit,investment,bond,bondPrime,RbMinus,taxPayments,isDefaultNextPeriod); % Nk*Nb matrix
@@ -481,6 +483,11 @@ tic
 for i=1:length(kGridLength)
     
     grid_k           = curvspace(kMin,kMax,kGridLength(i),2)';
+    % Since the profitFunction takes so much time, let's calculate it all
+    % at once to retrieve later
+    mANkByNa = repmat(grid_a',kGridLength(i),1);
+    mKNkByNa = repmat(grid_k,1,Na);
+    profitNkByNa = profitFunction(mANkByNa,mKNkByNa); % Nk by Na
     
     % Calculate Default Probability
     mCutOffValue = zeros(kGridLength(i),Nb);
@@ -516,7 +523,7 @@ for i=1:length(kGridLength)
 
     kPrime = repmat(grid_k,1,Nb); % Nk*Nb matrix
     bondPrime = repmat(grid_b',kGridLength(i),1); % Nk*Nb matrix
-
+    
     tic
     while distance > tolerance
 %         tic
@@ -677,7 +684,7 @@ savefig('q1d_bPolicy_3D')
 
 distributionStationary0 = (1/(Nk*Nb*Na*Na))*ones(Nk,Nb,Na,Na);
 distance=100;
-tolerance=0.000001;
+tolerance=0.0000000001;
 iteration=0;
 
 while distance>tolerance
@@ -708,7 +715,7 @@ end
 % Plot the distribution
 figure(9);
 [bb,kk]=meshgrid(grid_b, grid_k);
-aMinusDescription = ["low","medium","high"];
+aMinusDescription = ["low","","medium","","high"];
 
 for iaMinus = 1:Na
     subplot(1,Na,iaMinus);
@@ -828,10 +835,15 @@ fractionOfFirmsIssuingEquity = sum(sum(sum(sum(  mIsIssuingEquity .*distribution
 fprintf('The fraction of firms issuing equity is %2.8f\n', fractionOfFirmsIssuingEquity);
 
 T = table(defaultProbability,riskyBondReturn,leverageRatio,investment2Capital,fractionOfFirmsIssuingEquity)
+save('table','T')
 %     defaultProbability    riskyBondReturn       leverageRatio      investment2Capital    fractionOfFirmsIssuingEquity
 %     __________________    ________________    _________________    __________________    ____________________________
 % 
 %   3.56994771855542e-09    1.01010100649501    0.539685179800697     2.00309413226414          0.030296293479109      
 
-
+% Nk=20, Nb=20, Na=5
+%     defaultProbability    riskyBondReturn    leverageRatio    investment2Capital    fractionOfFirmsIssuingEquity
+%     __________________    _______________    _____________    __________________    ____________________________
+% 
+%         3.5699e-09            1.0101            0.65464             1.989                     0.030296      
 
