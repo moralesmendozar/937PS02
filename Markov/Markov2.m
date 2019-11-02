@@ -9,7 +9,7 @@
 % https://www.mathworks.com/help/econ/dtmc.simplot.html
 clear;
 clc;
-cd /home/moralesmendozar/Dropbox/03_UPenn/classes/2019_spring/706/Slides/codes/Markov
+cd /home/moralesmendozar/Dropbox/03_UPenn/classes/2019_fall/01_937-/PS02/Markov
 
 N = 10;
 m = rand(N,N);
@@ -26,8 +26,8 @@ end
 
 mc = dtmc(P);
 % mc = dtmc(P,'StateNames',['s01','s02','s03'])
-%figure(1)
-%graphplot(mc,'ColorNodes',true,'ColorEdges',true)
+figure(1)
+graphplot(mc,'ColorNodes',true,'ColorEdges',true)
 
 % Perform a simulation of 20 steps
 numsteps = 20;
@@ -44,8 +44,10 @@ x0 = [0 0 0 0 100 0 0 0 0 0];
 %or
 X0 = zeros(1,N);
 X0(5) = 100;
-numStep = 10;
+numStep = 100;
 X2 = simulate(mc,numStep, 'X0',x0);
+%X2 = simulate(mc,numStep, 'X0',100*ones(1,N));
 
 figure(3)
-sihttps://www.mathworks.com/help/econ/dtmc.graphplot.htmlmplot(mc,X2)
+simplot(mc,X2)
+%https://www.mathworks.com/help/econ/dtmc.graphplot.html
