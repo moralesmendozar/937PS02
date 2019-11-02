@@ -28,7 +28,10 @@ Nk_1 = 200;
 Nk_2 = 25;
 b_0 = 0;
 b_1 = 0.5;
+sssssbbbbbbbbbbbbbbbbbbbbbb
+jhlmhvkj
 
+gh
 %% Create grid for k and a
 k_min = 0.01; % setting k_min to 0 would pop up errors in the iteration
 % a_mean = (r + delta) / theta_1; % Lecture 1 Page 15/52 "picking E[a] s.t. k_mean=1"
