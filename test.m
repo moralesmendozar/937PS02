@@ -9,10 +9,7 @@ tic;
 % Grid for k - centered around k_mean = 1. 
 % k_max = (a_max/delta)^(1/(1-alpha))
 % k_min = 0
-% Grid for a - choose a_mean s.t. k_mean = 1. Nine grid points work well.
-% k_mean = (alpha * a_mean / (r_mean + delta))^(1/(1-alpha))
-% a_min = a_mean - m*sigma/(1-rho^2)^0.5
-% a_max = a_mean + m*sigma/(1-rho^2)^0.5
+
 
 %% Parametization
 rho = 0.8;
@@ -67,7 +64,7 @@ profit_min = profit(labor_min,a_min,k_grid_1);
 profit_mean = profit(labor_mean,a_mean,k_grid_1);
 profit_max = profit(labor_max,a_max,k_grid_1);
 
-figure (1)
+figure (112)
 plot(k_grid_1, profit_min,k_grid_1, profit_mean, k_grid_1, profit_max);
 title('Profit under different shocks')
 xlabel('Capital Stock')
@@ -100,7 +97,7 @@ distance = 100;
 k_grid = linspace(k_min, k_max, Nk);
 [aa,kk]=meshgrid(a_grid, k_grid);
 
-figure(2)
+figure(22)
 mesh(aa, kk, value0')
 
 tic;
@@ -326,12 +323,11 @@ ylabel('Optimal Financing - Max(-d,0)')
 %xlim([0,20])
 savefig('q1c1_financing_policy_2d') 
 
-save('nk200_results','k_grid','k_policy','value','Nk','k_policy_index','investment_policy','financing_policy')
+save('nk200_results','k_grid','k_policy','something','value','Nk','k_policy_index','investment_policy','financing_policy')
 
 %% see if # of grid is 25
 close all;
 
-load('nk25_results.mat')
 
 investment_policy=ones(Na, Nk);
 for i=1:Na
@@ -530,6 +526,10 @@ k_grid = linspace(k_min, k_max, Nk);
 [aa,kk]=meshgrid(a_grid, k_grid);
 
 tic;
+
+for what = 1:10
+    what +1
+end
 % phi = b_0 * k_grid_1 + b_1 * (i/k_grid_1 - delta).^2 .* k_grid_1;
 while distance > tolerance
     for i=1:Na
