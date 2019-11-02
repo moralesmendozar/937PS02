@@ -1,4 +1,5 @@
 % Shasha Wang PS1 Q3 FNCE 937
+%ram
 
 % If one wants to do MULTIGRID to speed up the process, just change
 % kGridLength to a vector
