@@ -4,7 +4,7 @@
 % kGridLength to a vector
 
 function [coefsRhoLambda Vrenewed] = funVectorCoefs02(rrho,llambda,...
-    Vinit,otherCoefs,kGridLength,saveDoc,numsteps)
+    Vinit,otherCoefs,kGridLength,save,numsteps)
 %this function finds the coefficients of a linear regression
 %   for a simulation of shocks, given the solution of a Bellman 
 %   function of a firm with an exogenous rule for default...
@@ -513,11 +513,9 @@ Zetasii = simulate(mc,numsteps); %are the shocks
 zminusi = 1; %take the initial one as the mean;
 k0i = 1;
 b0i = 1;
-%Xs = ones(numsteps,3); %contains the elements for regression
-Xs = ones(numsteps,2); %contains the elements for regression
+Xs = ones(numsteps,3); %contains the elements for regression
 ys = ones(numsteps,1); %contains the 
-%Xs2 = ones(numsteps,4);
-Xs2 = ones(numsteps,3);
+Xs2 = ones(numsteps,4);
 ys2 = ones(numsteps,1);
 k = kMin;
 b = 0;
@@ -526,15 +524,15 @@ for ii = 1:numsteps
     prodShocki = Zetasii(ii);
     kprime = kPolicy(k0i,b0i,prodShocki,zminusi);
     bprime = bPolicy(k0i,b0i,prodShocki,zminusi);
-    invest = investmentFunction(k,kprime);
+    invest = investmentFunction(k,kPrime);
     Q = value0(k0i,b0i,prodShocki,zminusi)/k;
     profit_i = profitFunction(prodShock,k);
-    Xs(ii,1) = Q; %Q
-    Xs(ii,2) = profit_i; %profit_i
+    Xs(ii,2) = Q; %Q
+    Xs(ii,3) = ; %profit_i
     ys(ii) = invest/k; % i/k
-    Xs2(ii,1) = Q; %Q
-    Xs2(ii,2) = profit_i; %profit_i
-    Xs2(ii,3) = log(k); %log(k)
+    Xs2(ii,2) = Q; %Q
+    Xs2(ii,3) = profit_i; %profit_i
+    Xs2(ii,4) = log(k); %log(k)
     ys2(ii) = b/k; % b/k
     %find next period values:
     k0i = kPolicyIndex(k0i,b0i,prodShocki,zminusi);
@@ -544,16 +542,13 @@ for ii = 1:numsteps
     b = bprime;
 end
 %Burn some values (first 20%):
-Xs = Xs((0.2*numsteps):end,:);
-ys = ys((0.2*numsteps):end,:);
-Xs2 = Xs2((0.2*numsteps):end,:);
-ys2 = ys2((0.2*numsteps):end,:);
-mdl = fitlm(Xs,ys);
-betas = mdl.Coefficients.Estimate;
-mdl2 = fitlm(Xs2,ys2);
-gammas = mdl2.Coefficients.Estimate;
 
-coefsRhoLambda = [betas' gammas'];
+% mdl = fitlm(Xs,ys);
+% betas = mdl.Coefficients.Estimate;
+% mdl2 = fitlm(Xs2,ys2);
+% gammas = mdl2.Coefficients.Estimate;
+
+coefsRhoLambda = [betas gammas];
 Vrenewed = value0;
 
 %erase variables which can give trouble when recovered
@@ -561,8 +556,8 @@ rrhoUsed = rrho;
 llambdaUsed = llambda;
 clear rrho llambda;
 %save data
-if saveDoc ==1
-    filename = '00_data_01';
+if save ==1
+    filename = '00_data_00';
     save(filename)
 end
 

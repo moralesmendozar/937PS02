@@ -854,3 +854,51 @@ save('table','T')
 % 
 %         3.5699e-09            1.0101            0.65464             1.989                     0.030296      
 
+%% To get the regression:
+numsteps = 1000;
+mc = dtmc(m_a_prob);
+Zetasii = simulate(mc,numsteps); %are the shocks
+zminusi = 1; %take the initial one as the mean;
+k0i = 1;
+b0i = 1;
+Xs = ones(numsteps,3); %contains the elements for regression
+ys = ones(numsteps,1); %contains the 
+Xs2 = ones(numsteps,4);
+ys2 = ones(numsteps,1);
+k = kMin;
+b = 0;
+for ii = 1:numsteps
+    prodShock = exp(grid_a_log(Zetasii(ii)));
+    prodShocki = Zetasii(ii);
+    kprime = kPolicy(k0i,b0i,prodShocki,zminusi);
+    bprime = bPolicy(k0i,b0i,prodShocki,zminusi);
+    invest = investmentFunction(k,kprime);
+    Q = value0(k0i,b0i,prodShocki,zminusi)/k;
+    profit_i = profitFunction(prodShock,k);
+    Xs(ii,2) = Q; %Q
+    Xs(ii,3) = profit_i; %profit_i
+    ys(ii) = invest/k; % i/k
+    Xs2(ii,2) = Q; %Q
+    Xs2(ii,3) = profit_i; %profit_i
+    Xs2(ii,4) = log(k); %log(k)
+    ys2(ii) = b/k; % b/k
+    %find next period values:
+    k0i = kPolicyIndex(k0i,b0i,prodShocki,zminusi);
+    b0i = bPolicyIndex(k0i,b0i,prodShocki,zminusi);
+    zminusi = prodShocki;
+    k = kprime;
+    b = bprime;
+end
+%Burn some values (first 20%):
+Xs = Xs((0.2*numsteps):end,:);
+ys = ys((0.2*numsteps):end,:);
+Xs2 = Xs2((0.2*numsteps):end,:);
+ys2 = ys2((0.2*numsteps):end,:);
+mdl = fitlm(Xs,ys);
+betas = mdl.Coefficients.Estimate;
+mdl2 = fitlm(Xs2,ys2);
+gammas = mdl2.Coefficients.Estimate;
+
+coefsRhoLambda = [betas' gammas'];
+
+
