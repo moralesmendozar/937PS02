@@ -1,6 +1,6 @@
 % For PS02, ex 02.
 % Wharton @ Penn.
-%   Shaha and Rodrigo M.
+%   Shasha and Rodrigo M.
 
 % matrix coefficients contains results:
 %
