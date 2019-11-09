@@ -5,7 +5,7 @@
 % matrix coefficients contains results:
 %
 % Housekeeping
-loadedData = 1;
+loadedData = 0;
 if loadedData ==1
     Vinit = Vrenewed;
 else
@@ -120,6 +120,6 @@ display([num2str(coefficients(minerrorii,:))])
 
 saveData = 1;
 if saveData ==1
-    filename = '00_data_ex03_01';
+    filename = '00_data_ex03_02';
     save(filename)
 end
